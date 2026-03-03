@@ -1,0 +1,57 @@
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+
+export default function exerciseScreen() {
+  return (
+    <View style={styles.container}>
+      <View style={styles.content}>
+        <Text style={styles.display}>00:00:00</Text>
+      </View>
+      <View style={styles.bottomButtons}>
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}> START</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}> PAUSE </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1, // replaces height: 100vh
+    backgroundColor: "#000000",
+  },
+
+  content: {
+    flex: 1, // pushes footer down
+    justifyContent: "center", // vertical center
+    alignItems: "center", // horizontal center
+  },
+
+  display: {
+    fontSize: 64, // 4rem approx
+    color: "white",
+    fontWeight: "700",
+  },
+
+  bottomButtons: {
+    flexDirection: "row",
+    justifyContent: "center",
+    padding: 20,
+  },
+
+  button: {
+    backgroundColor: "#06b2cc",
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 999,
+    marginHorizontal: 8, // replaces gap
+  },
+
+  buttonText: {
+    fontSize: 18,
+    fontWeight: "600",
+  },
+});
