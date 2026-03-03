@@ -34,6 +34,7 @@ const styles = StyleSheet.create({
     fontSize: 64, // 4rem approx
     color: "white",
     fontWeight: "700",
+    fontFamily: "Outfit_700Bold",
   },
 
   bottomButtons: {
@@ -53,5 +54,6 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 18,
     fontWeight: "600",
+    fontFamily: "Outfit_700Bold",
   },
 });
