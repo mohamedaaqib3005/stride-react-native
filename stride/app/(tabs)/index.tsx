@@ -1,10 +1,7 @@
 import { View, Text, Button } from "react-native";
-import { useState } from "react";
 import { initialize, requestPermission, readRecords } from "react-native-health-connect";
 
 export default function HomeScreen() {
-
-  const [connected, setConnected] = useState(false);
 
   const connectHealth = async () => {
     try {
@@ -18,20 +15,12 @@ export default function HomeScreen() {
 
       console.log("Permissions:", permissions);
 
-      setConnected(true);
-
     } catch (e) {
       console.log("Permission error:", e);
     }
   };
 
   const readSteps = async () => {
-
-    if (!connected) {
-      console.log("Health Connect not initialized");
-      return;
-    }
-
     try {
 
       const steps = await readRecords("Steps", {
@@ -66,11 +55,7 @@ export default function HomeScreen() {
 
       <View style={{ height: 20 }} />
 
-      <Button
-        title="Read Steps"
-        onPress={readSteps}
-        disabled={!connected}
-      />
+      <Button title="Read Steps" onPress={readSteps} />
 
     </View>
   );
