@@ -7,16 +7,13 @@
     "icon": "./assets/images/icon.png",
     "scheme": "stride",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": false,
+    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.stride"
     },
     "android": {
       "package": "com.anonymous.stride",
-  // "permissions": [
-  //   "android.permission.health.READ_STEPS"
-  // ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
