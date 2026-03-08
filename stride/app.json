@@ -13,6 +13,9 @@
       "bundleIdentifier": "com.anonymous.stride"
     },
     "android": {
+      "permissions": [
+    "android.permission.health.READ_STEPS"
+  ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

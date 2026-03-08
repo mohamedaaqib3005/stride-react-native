@@ -1,59 +1,73 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, Button } from "react-native";
+import { useState } from "react";
+import { initialize, requestPermission, readRecords } from "react-native-health-connect";
 
-export default function exerciseScreen() {
+export default function HomeScreen() {
+
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  const connectHealth = async () => {
+    try {
+
+      const status = await initialize();
+      console.log("Initialized:", status);
+
+      if (status) {
+        setIsInitialized(true);
+      }
+
+      const permissions = await requestPermission([
+        { accessType: "read", recordType: "Steps" },
+      ]);
+
+      console.log("Permissions:", permissions);
+
+    } catch (e) {
+      console.log("Permission error:", e);
+    }
+  };
+  const readSteps = async () => {
+    try {
+
+      const steps = await readRecords("Steps", {
+        timeRangeFilter: {
+          operator: "between",
+          startTime: new Date(Date.now() - 86400000).toISOString(),
+          endTime: new Date().toISOString(),
+        },
+      });
+
+      const totalSteps = steps.records.reduce(
+        (sum, record) => sum + record.count,
+        0
+      );
+
+      console.log("Total steps:", totalSteps);
+
+    } catch (e) {
+      console.log("Read error:", e);
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.display}>00:00:00</Text>
-      </View>
-      <View style={styles.bottomButtons}>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}> START</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button}>
-          <Text style={styles.buttonText}> PAUSE </Text>
-        </TouchableOpacity>
-      </View>
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "white"
+      }}
+    >
+      <Text style={{ fontSize: 18, marginBottom: 20 }}>
+        Health Connect Test
+      </Text>
+
+      <Button title="Connect Health Connect" onPress={connectHealth} />
+
+      <View style={{ height: 20 }} />
+
+      <Button title="Read Steps" onPress={readSteps} />
+
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1, // replaces height: 100vh
-    backgroundColor: "#000000",
-  },
-
-  content: {
-    flex: 1, // pushes footer down
-    justifyContent: "center", // vertical center
-    alignItems: "center", // horizontal center
-  },
-
-  display: {
-    fontSize: 64, // 4rem approx
-    color: "white",
-    fontWeight: "700",
-    fontFamily: "Outfit_700Bold",
-  },
-
-  bottomButtons: {
-    flexDirection: "row",
-    justifyContent: "center",
-    padding: 20,
-  },
-
-  button: {
-    backgroundColor: "#06b2cc",
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 999,
-    marginHorizontal: 8, // replaces gap
-  },
-
-  buttonText: {
-    fontSize: 18,
-    fontWeight: "600",
-    fontFamily: "Outfit_700Bold",
-  },
-});
