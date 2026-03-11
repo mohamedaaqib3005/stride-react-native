@@ -1,73 +1,87 @@
-import { View, Text, Button } from "react-native";
-import { useState } from "react";
-import { initialize, requestPermission, readRecords } from "react-native-health-connect";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import useWorkout from '../hooks/useWorkout'
 
-export default function HomeScreen() {
 
-  const [isInitialized, setIsInitialized] = useState(false);
+function ExerciseScreen() {
 
-  const connectHealth = async () => {
-    try {
 
-      const status = await initialize();
-      console.log("Initialized:", status);
-
-      if (status) {
-        setIsInitialized(true);
-      }
-
-      const permissions = await requestPermission([
-        { accessType: "read", recordType: "Steps" },
-      ]);
-
-      console.log("Permissions:", permissions);
-
-    } catch (e) {
-      console.log("Permission error:", e);
-    }
-  };
-  const readSteps = async () => {
-    try {
-
-      const steps = await readRecords("Steps", {
-        timeRangeFilter: {
-          operator: "between",
-          startTime: new Date(Date.now() - 86400000).toISOString(),
-          endTime: new Date().toISOString(),
-        },
-      });
-
-      const totalSteps = steps.records.reduce(
-        (sum, record) => sum + record.count,
-        0
-      );
-
-      console.log("Total steps:", totalSteps);
-
-    } catch (e) {
-      console.log("Read error:", e);
-    }
-  };
+  const {
+    handleStart,
+    handleStop } = useWorkout();
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        backgroundColor: "white"
-      }}
-    >
-      <Text style={{ fontSize: 18, marginBottom: 20 }}>
-        Health Connect Test
-      </Text>
+    <View style={styles.container}>
+      <View style={styles.content}>
+        <Text style={styles.display}>00:00:00</Text>
+        {/* //text is inline */}
+      </View>
 
-      <Button title="Connect Health Connect" onPress={connectHealth} />
+      <View style={styles.bottomButtons}>
+        <TouchableOpacity style={styles.button} onPress={handleStart}>
+          <Text style={styles.buttonText}> START</Text>
+        </TouchableOpacity>
 
-      <View style={{ height: 20 }} />
-
-      <Button title="Read Steps" onPress={readSteps} />
-
+        <TouchableOpacity style={styles.button} onPress={handleStop}>
+          <Text style={styles.buttonText}> STOP </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
+
+const globalConstants = {
+  primaryColor: "#111111"
+}
+const globalStyles = StyleSheet.create({
+  primary: {
+    backgroundColor: "#111111",
+  }
+
+
+
+})
+
+const styles = StyleSheet.create({
+
+  container: {
+    flex: 1, // replaces height: 100vh
+    backgroundColor: globalConstants.primaryColor,
+  },
+
+  content: {
+    flex: 1, // pushes footer down
+    justifyContent: "center", // vertical center
+    alignItems: "center", // horizontal center
+  },
+
+  display: {
+    fontSize: 64, // 4rem approx
+    color: "white",
+    fontWeight: "700",
+    fontFamily: "Outfit_700Bold",
+  },
+
+  bottomButtons: {
+    flexDirection: "row",
+    justifyContent: "center",
+    padding: 20,
+  },
+
+  button: {
+    backgroundColor: "#06b2cc",
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 999,
+    marginHorizontal: 8, // replaces gap
+  },
+
+  buttonText: {
+    fontSize: 18,
+    fontWeight: "600",
+    fontFamily: "Outfit_700Bold",
+  },
+});
+
+
+
+export default ExerciseScreen
