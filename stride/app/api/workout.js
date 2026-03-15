@@ -3,16 +3,16 @@ const BASE_URL = "https://guava-3a7j.onrender.com";
 export async function startWorkout() {
 
   try {
-    const result = await fetch(`${BASE_URL}/api/workouts`, {  // wait for network response
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        "created_at": "2026-03-10T11:32:02.920Z"
-      })
-    });
-
+    const result = await fetch(`${BASE_URL}/api/workouts`,  // wait for network response
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "started_at": new Date().toISOString()
+        })
+      });
 
 
 
@@ -21,16 +21,19 @@ export async function startWorkout() {
     }
     console.log("Raw response:", result);
 
-    const data = await result.json();
+    const data = await result.json();// converts stream → text → parse JSON → object
 
     console.log("Parsed JSON:", data); //wait for body parsing
 
     return data;
   }
   catch (error) {
-    console.error("API error", error)
+    console.error("API error", error);
+    return null;
+
   }
 }
+
 
 // startWorkout();
 
@@ -39,35 +42,39 @@ export async function startWorkout() {
 // Returns a Promise with the response
 
 
-
-export async function stopWorkout() {
+export async function stopWorkout(workout_id) {
   try {
-    const result = await fetch(`${BASE_URL}/api/workouts/{workout_id}/status`, {
+
+    console.log("Stopping workout id:", workout_id);
+
+    const result = await fetch(`${BASE_URL}/api/workouts/${workout_id}/status`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({})
-    })
+      body: JSON.stringify({
+        status: "stop",
+        modified_at: new Date().toISOString()
+      })
+    });
 
     if (!result.ok) {
-      throw new Error("Request failed")
+      const errorText = await result.text();
+      console.log("Server error:", errorText);
+      throw new Error(`Request failed ${result.status}`);
     }
+    console.log("Status:", result.status)
+    const data = await result.text();
+    console.log("Server response:", data);
 
-    console.log("Raw response", result)
+    if (!result.ok) {
+      throw new Error(`Request failed ${result.status}`)
+    }
+    return data;
 
-    const data = await result.json()
-    console.log("parsedData", data)
-
+  } catch (error) {
+    console.error("API error", error);
   }
-  catch (error) {
-    console.error("API error", error)
-  }
-
-
-
 }
-
-
 // stopWorkout()
 

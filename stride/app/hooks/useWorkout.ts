@@ -10,12 +10,17 @@ function useWorkout() {
 
   async function handleStart() {
     const data = await startWorkout();
+    if (!data) {
+      console.log("Workout start failed");
+      return;
+    }
     const workoutId = data.id
     setWorkoutId(workoutId);
     setIsRunning(true);
   }
 
   async function handleStop() {
+    if (!workoutId) return;
     await stopWorkout(workoutId)
     setIsRunning(false);
     setWorkoutId(null);

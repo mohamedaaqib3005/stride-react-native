@@ -1,28 +1,23 @@
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import useWorkout from '../hooks/useWorkout'
-
+import useWorkout from "../hooks/useWorkout";
 
 function ExerciseScreen() {
-
-
-  const {
-    handleStart,
-    handleStop } = useWorkout();
+  const { handleStart, handleStop } = useWorkout();
 
   return (
     <View style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.display}>00:00:00</Text>
-        {/* //text is inline */}
+        {/* text is inline */}
       </View>
 
       <View style={styles.bottomButtons}>
         <TouchableOpacity style={styles.button} onPress={handleStart}>
-          <Text style={styles.buttonText}> START</Text>
+          <Text style={styles.buttonText}>START</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.button} onPress={handleStop}>
-          <Text style={styles.buttonText}> STOP </Text>
+          <Text style={styles.buttonText}>STOP</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -30,19 +25,16 @@ function ExerciseScreen() {
 }
 
 const globalConstants = {
-  primaryColor: "#111111"
-}
+  primaryColor: "#111111",
+};
+
 const globalStyles = StyleSheet.create({
   primary: {
     backgroundColor: "#111111",
-  }
-
-
-
-})
+  },
+});
 
 const styles = StyleSheet.create({
-
   container: {
     flex: 1, // replaces height: 100vh
     backgroundColor: globalConstants.primaryColor,
@@ -55,7 +47,7 @@ const styles = StyleSheet.create({
   },
 
   display: {
-    fontSize: 64, // 4rem approx
+    fontSize: 64, // ~4rem
     color: "white",
     fontWeight: "700",
     fontFamily: "Outfit_700Bold",
@@ -82,6 +74,4 @@ const styles = StyleSheet.create({
   },
 });
 
-
-
-export default ExerciseScreen
+export default ExerciseScreen;
