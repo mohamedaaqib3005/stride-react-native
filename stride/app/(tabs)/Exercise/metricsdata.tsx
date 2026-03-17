@@ -3,10 +3,10 @@ import { initialize, requestPermission, readRecords } from "react-native-health-
 
 function ExerciseScreen() {
   const recordTypes = [
-    "Steps",
+    // "Steps",
     // "Distance",
     // "ActiveCaloriesBurned",
-    // "TotalCaloriesBurned",
+    "TotalCaloriesBurned",
     // "Speed",
     // "Power",
     // "HeartRate",

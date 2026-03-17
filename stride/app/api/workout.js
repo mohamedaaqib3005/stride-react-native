@@ -2,6 +2,7 @@ const BASE_URL = "https://guava-3a7j.onrender.com";
 
 export async function startWorkout() {
 
+
   try {
     const result = await fetch(`${BASE_URL}/api/workouts`,  // wait for network response
       {
@@ -10,7 +11,7 @@ export async function startWorkout() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          "started_at": new Date().toISOString()
+          "started_at": (new Date().toISOString()).slice(0, -1)
         })
       });
 
@@ -41,11 +42,11 @@ export async function startWorkout() {
 //  Sends it to the server
 // Returns a Promise with the response
 
-
 export async function stopWorkout(workout_id) {
-  try {
 
-    console.log("Stopping workout id:", workout_id);
+  try {
+    console.log(`stopping for ${workout_id}`)
+    console.log("date", new Date())
 
     const result = await fetch(`${BASE_URL}/api/workouts/${workout_id}/status`, {
       method: "PATCH",
@@ -53,28 +54,25 @@ export async function stopWorkout(workout_id) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        status: "stop",
-        modified_at: new Date().toISOString()
+        "status": "stop",
+        modified_at: (new Date().toISOString()).slice(0, -1)
       })
-    });
+    })
+    console.log("result", result);
+    console.log("HTTP status", result.status);
 
-    if (!result.ok) {
-      const errorText = await result.text();
-      console.log("Server error:", errorText);
-      throw new Error(`Request failed ${result.status}`);
-    }
-    console.log("Status:", result.status)
-    const data = await result.text();
-    console.log("Server response:", data);
-
-    if (!result.ok) {
-      throw new Error(`Request failed ${result.status}`)
-    }
-    return data;
+    const text = await result.text();
+    console.log("response", text);
+    return text;
 
   } catch (error) {
-    console.error("API error", error);
+    console.log("api error", error)
+    return null;
   }
 }
+
+
+
+
 // stopWorkout()
 
