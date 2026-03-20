@@ -8,18 +8,19 @@ function useWorkout() {
   const [workoutId, setWorkoutId] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
 
-  async function handleStart() {
-    const data = await startWorkout();
-    if (!data) {
+  async function startWorkoutSession() {
+    const workoutResponse = await startWorkout();
+    if (!workoutResponse) {
       console.log("Workout start failed");
       return;
     }
-    const workoutId = data.id
+    const workoutId = workoutResponse.id
     setWorkoutId(workoutId);
     setIsRunning(true);
+    return workoutId;
   }
 
-  async function handleStop() {
+  async function stopWorkoutSession() {
     if (!workoutId) return;
     await stopWorkout(workoutId)
     setIsRunning(false);
@@ -28,8 +29,8 @@ function useWorkout() {
   }
 
   return {
-    handleStart,
-    handleStop,
+    startWorkoutSession,
+    stopWorkoutSession,
     isRunning,
   }
 }

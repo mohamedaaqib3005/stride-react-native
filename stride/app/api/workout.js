@@ -11,7 +11,7 @@ export async function startWorkout() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          "started_at": (new Date().toISOString()).slice(0, -1)
+          "started_at": (new Date().toISOString())
         })
       });
 
@@ -55,7 +55,7 @@ export async function stopWorkout(workout_id) {
       },
       body: JSON.stringify({
         "status": "stop",
-        modified_at: (new Date().toISOString()).slice(0, -1)
+        modified_at: (new Date().toISOString())
       })
     })
     console.log("result", result);

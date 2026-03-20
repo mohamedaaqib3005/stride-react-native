@@ -1,17 +1,44 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, Pressable, StyleSheet } from "react-native";
 import useWorkout from "../hooks/useWorkout";
-import * as Location from "expo-location";
+import {
+  requestForegroundPermissionsAsync,
+  watchPositionAsync,
+  getCurrentPositionAsync
+} from 'expo-location';// named export import with the name, * wants all the named exports from expo location and store them in a obj called Location
 import { useRef } from "react";
 
 
 function ExerciseScreen() {
 
+  const socketRef = useRef(null);
   const locationSubscription = useRef(null);
 
+  function connectWebsocket(workoutId) {
+    const socket = new WebSocket('ws://guava-3a7i.onrender.com/ws');
+    socket.onopen = (event) => {
+      /* Connection established */
+      console.log("Websocket connected")
+    };
+    socket.onmessage = (event) => {
+      /* Message received */
+      console.log("receivedmessage", event.data)
+    };
+    socket.onerror = (error) => {
+      /* Error occurred */
+      console.log("websocket error", error)
+      console.log("websocketmessage", JSON.stringify(error, null, 2))
+    };
+    socket.onclose = (event) => {
+      /* Connection closed */
+    };
 
-  async function fetchAllData() {
-    const permissionObject = await Location.requestForegroundPermissionsAsync()
-    console.log("permissions", permissionObject);
+    socketRef.current = socket;
+
+  }
+
+  async function watchUserLocation(workoutId) {
+    const permissionObject = await requestForegroundPermissionsAsync()
+    // console.log("permissions", permissionObject);
     const status = permissionObject.status;
     console.log("permission status", status);
 
@@ -20,48 +47,42 @@ function ExerciseScreen() {
       return;
     }
 
-    const location = await Location.getCurrentPositionAsync({
+    const location = await getCurrentPositionAsync({
       accuracy: Location.Accuracy.High
     })
-    console.log("location", location);
 
-    const latitudeData = location.coords.latitude;
-    console.log("latitudeData", latitudeData)
-
-    const longitudeData = location.coords.longitude;
-    console.log("longitudedata", longitudeData);
-    const Speed = location.coords.speed;
-    console.log("speed", Speed);
-    const altitudeData = location.coords.altitude;
-    console.log("altitudedata", altitudeData);
-
-    locationSubscription.current = await Location.watchPositionAsync({
+    locationSubscription.current = await watchPositionAsync({
       accuracy: Location.Accuracy.High,
       timeInterval: 5000,
       distanceInterval: 0
     },
       (location) => {
         const payload = {
-          timestamp: new Date(location.timestamp).toISOString(),
-          location: {
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-            speed: location.coords.speed,
-            altitude: location.coords.altitude,
-          }
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+          workout_id: workoutId,
+          time: new Date(location.timestamp).toISOString(),
+          altitude: location.coords.altitude,
+        }
+
+        const message = {
+          type: "location",
+          payload
         }
         // console.log("Time:", location.timestamp);
         // console.log(Date.now())
         console.log("PAYLOAD ----");
-        console.log(JSON.stringify(payload, null, 2))
+        console.log(JSON.stringify(message, null, 2))
         // console.log("Latitude", location.coords.latitude);
         // console.log("Longitude", location.coords.longitude);
         // console.log("Speed", location.coords.speed);
         // console.log("Altitude", location.coords.altitude);
 
+        if (socketRef.current) {
+          socketRef.current.send(JSON.stringify(message));
+        }
       }
-    )
-
+    );
   }
 
 
@@ -73,15 +94,32 @@ function ExerciseScreen() {
     }
 
   }
-  const { handleStart, handleStop } = useWorkout();
-  async function startWorkout() {
-    handleStart()
-    await fetchAllData()
+
+
+  function closeWebsocketConnection() {
+    if (socketRef.current) {
+      socketRef.current.close();
+      socketRef.current = null;
+      console.log("Websocket closed")
+    }
   }
 
-  function stopWorkout() {
-    handleStop()
+  const { startWorkoutSession, stopWorkoutSession } = useWorkout();
+
+  async function handleStartWorkout() {
+    if (locationSubscription.current) {
+      console.log("Workout already running")
+      return;
+    }
+    const workoutId = await startWorkoutSession();
+    connectWebsocket(workoutId) //  socketRef.current = await connectWebsocket(workoutId);
+    await watchUserLocation(workoutId);
+  }
+
+  function handlestopWorkout() {
+    stopWorkoutSession()
     stopFetchingData()
+    closeWebsocketConnection()
   }
   return (
     <View style={styles.container}>
@@ -91,13 +129,14 @@ function ExerciseScreen() {
       </View>
 
       <View style={styles.bottomButtons}>
-        <TouchableOpacity style={styles.button} onPress={startWorkout}>
+        <Pressable style={styles.button} onPressIn={handleStartWorkout}>
           <Text style={styles.buttonText}>START</Text>
-        </TouchableOpacity>
+        </Pressable>
 
-        <TouchableOpacity style={styles.button} onPress={stopWorkout}>
+        <Pressable
+          style={styles.button} onPressIn={handlestopWorkout}>
           <Text style={styles.buttonText}>STOP</Text>
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </View>
   );
@@ -107,20 +146,15 @@ const globalConstants = {
   primaryColor: "#111111",
 };
 
-const globalStyles = StyleSheet.create({
-  primary: {
-    backgroundColor: "#111111",
-  },
-});
+// const globalStyles = StyleSheet.create({
+//   primary: {
+//     backgroundColor: "#111111",
+//   },
+// });
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, // replaces height: 100vh
-    backgroundColor: globalConstants.primaryColor,
-  },
-
-  content: {
-    flex: 1, // pushes footer down
+    flex: 1, // replaces height:
     justifyContent: "center", // vertical center
     alignItems: "center", // horizontal center
   },
@@ -157,11 +191,10 @@ export default ExerciseScreen;
 
 
 
-// {
-//   "timestamp": "2026-03-16T03:01:54.250Z",
-//     "location": {
-//     "latitude": 12.9304615,
-//       "longitude": 77.5966228,
-//         "altitude": 830.5999755859375,
-//           "speed": 0
-//   }
+
+// use Pressable instead of Touchable Opacity
+// named vs default imports
+// just import the needed methods from location object
+// change handleStart name to startWorkout ,data use specific descriptive names
+// connect websocket should only return websocket object if the websocket connection is established
+// smaller code changes refactor and commit ,push
