@@ -2,29 +2,47 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 // import useWorkout from "../hooks/useWorkout";
 // import { handleStartWorkout, handleStopWorkout } from "../hooks/useWebsocket"
 import useWorkoutController from "../hooks/useWorkoutController";
-// named export import with the name, * wants all the named exports from expo location and store them in a obj called Location
+import useTimer from "../hooks/useTimer";
+import Timer from "../components/timer";
+
 
 
 function ExerciseScreen() {
 
-
   const { handleStartWorkout, handleStopWorkout } = useWorkoutController();
+
+  const { time, startTimer, pauseTimer, stopTimer } = useTimer();
+  const handleStart = () => {
+    startTimer();
+    handleStartWorkout();
+  }
+  const handleStop = () => {
+    stopTimer();
+    handleStopWorkout()
+  }
+  const handlePause = () => {
+    pauseTimer();
+  }
 
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Text style={styles.display}>00:00:00</Text>
+        <Timer style={styles.display} time={time} />{/* cannot use timer inside text component since it returns view ... */}
         {/* text is inline */}
       </View>
 
       <View style={styles.bottomButtons}>
-        <Pressable style={styles.button} onPressIn={handleStartWorkout}>
+        <Pressable style={styles.button} onPressIn={handleStart}>
           <Text style={styles.buttonText}>START</Text>
         </Pressable>
 
         <Pressable
-          style={styles.button} onPressIn={handleStopWorkout}>
+          style={styles.button} onPressIn={handleStop}>
           <Text style={styles.buttonText}>STOP</Text>
+        </Pressable>
+        <Pressable
+          style={styles.button} onPressIn={handlePause}>
+          <Text style={styles.buttonText}>PAUSE</Text>
         </Pressable>
       </View>
     </View>
@@ -41,11 +59,17 @@ const globalConstants = {
 //   },
 // });
 
+export default ExerciseScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1, // replaces height:
     justifyContent: "center", // vertical center
     alignItems: "center", // horizontal center
+  },
+  content: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   display: {
@@ -76,7 +100,6 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ExerciseScreen;
 
 
 
