@@ -1,5 +1,4 @@
 import { View, Text, StyleSheet } from "react-native";
-import time from "../hooks/useTimer";
 
 function Timer({ time }) {
 
