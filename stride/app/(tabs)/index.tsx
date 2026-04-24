@@ -12,9 +12,10 @@ function ExerciseScreen() {
   const { handleStartWorkout, handleStopWorkout } = useWorkoutController();
 
   const { time, startTimer, pauseTimer, stopTimer } = useTimer();
-  const handleStart = () => {
-    startTimer();
-    handleStartWorkout();
+  const handleStart = async () => {
+    const result = await handleStartWorkout();
+    if (result?.success) startTimer();
+
   }
   const handleStop = () => {
     stopTimer();

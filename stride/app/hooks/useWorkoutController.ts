@@ -7,13 +7,14 @@ import {
 import connectWebsocket from '../services/websocketService';
 import { useRef } from "react";
 import useWorkout from "./useWorkout"
+import type { LocationSubscription } from 'expo-location';
 
 function useWorkoutController() {
-  const socketRef = useRef(null);
-  const locationSubscription = useRef(null);
+  const socketRef = useRef<WebSocket | null>(null);
+  const locationSubscription = useRef<LocationSubscription | null>(null);
   const { startWorkoutSession, stopWorkoutSession } = useWorkout()
 
-  async function watchUserLocation(workoutId) {
+  async function watchUserLocation(workoutId: string) {
     const permissionObject = await requestForegroundPermissionsAsync()
     // console.log("permissions", permissionObject);
     const status = permissionObject.status;
@@ -107,8 +108,8 @@ function useWorkoutController() {
 
   }
 
-  function handleStopWorkout() {
-    const session = stopWorkoutSession()
+  async function handleStopWorkout() {
+    const session = await stopWorkoutSession()
     const location = stopWatchingUserLocation()
     const socket = closeWebsocketConnection()
     return {

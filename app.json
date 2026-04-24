@@ -1,0 +1,6 @@
+{
+  "expo": {
+    "scheme": "stride",
+    "plugins": ["expo-secure-store"]
+  }
+}
