@@ -15,6 +15,7 @@ function useWorkout() {
       return;
     }
     const workoutId = workoutResponse.id
+    console.log("workoutId", workoutId)
     setWorkoutId(workoutId);
     setIsRunning(true);
     return workoutId;

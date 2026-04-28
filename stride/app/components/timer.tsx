@@ -9,6 +9,7 @@ function formatTime(time) {
 
   return `${h}:${m}:${s}`;
 }
+
 function Timer({ time }) {
 
   return (
@@ -36,7 +37,5 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   button: {}
-}
-
-)
+});
 

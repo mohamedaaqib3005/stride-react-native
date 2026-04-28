@@ -4,11 +4,28 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import useWorkoutController from "../hooks/useWorkoutController";
 import useTimer from "../hooks/useTimer";
 import Timer from "../components/timer";
+import * as SecureStore from "expo-secure-store";
+import { Redirect } from 'expo-router';
 
 
 
 function ExerciseScreen() {
 
+
+  const handleLogin = async () => {
+    const authToken = await SecureStore.getItemAsync("token");
+    console.log("authToken", authToken);
+
+    if (authToken) {
+      return <Redirect href="/myExercises" />;
+    }
+    else {
+      return <Redirect href="/login" />;
+
+    }
+  }
+
+  handleLogin()
   const { handleStartWorkout, handleStopWorkout } = useWorkoutController();
 
   const { time, startTimer, pauseTimer, stopTimer } = useTimer();
