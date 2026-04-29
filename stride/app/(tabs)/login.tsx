@@ -1,7 +1,7 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import * as AuthSession from "expo-auth-session";
-import * as WebBrowser from "expo-web-browser";
-import * as SecureStore from "expo-secure-store";
+import { makeRedirectUri } from "expo-auth-session";
+import { openAuthSessionAsync } from "expo-web-browser";
+import { setItemAsync, getItemAsync } from "expo-secure-store";
 
 
 
@@ -9,10 +9,10 @@ const API_BASE = "https://guava-3a7j.onrender.com/api/v1/login?redirect_url=";
 
 function LoginScreen() {
 
-  const redirectUri = AuthSession.makeRedirectUri(
+  const redirectUri = makeRedirectUri(
     {
       scheme: "stride",
-      path: "myExercises"
+      path: "myWorkouts"
     }
   )
 
@@ -24,7 +24,7 @@ function LoginScreen() {
 
   const login = async () => {
     try {
-      const response = await WebBrowser.openAuthSessionAsync( // returns a promise with result or error{type:success,url:string} where type is type of result state,url is redirect url
+      const response = await openAuthSessionAsync( // returns a promise with result or error{type:success,url:string} where type is type of result state,url is redirect url
         authUrl,
         redirectUri
       )
@@ -39,9 +39,9 @@ function LoginScreen() {
 
         if (token) {
           // Store token in secure Store
-          await SecureStore.setItemAsync("token", token);
+          await setItemAsync("token", token);
 
-          const savedToken = await SecureStore.getItemAsync("token");
+          const savedToken = await getItemAsync("token");
           console.log("savedToken", savedToken)
         }
       }
@@ -57,7 +57,7 @@ function LoginScreen() {
       <View>
         <Text>Please login before starting your workout</Text>
         <Pressable onPress={login} style={styles.loginButtons}>
-          <Text>Login</Text>
+          <Text style={styles.buttonText}>Login with Google</Text>
         </Pressable>
       </View>
     </>
@@ -78,16 +78,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#06b2cc",
     marginTop: 400,
     paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
+    paddingHorizontal: 50,
+    borderRadius: 24,
     justifyContent: "center",
     alignItems: "center"
   },
   buttonText: {
-    color: "white"
+    color: "white",
+    fontWeight: "600",
+    fontFamily: "Outfit_700Bold",
   }
 })
 
 
-//store authorization header and read JWT
 

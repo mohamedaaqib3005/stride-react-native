@@ -5,28 +5,11 @@ import { View, Text, Pressable, StyleSheet } from "react-native";
 import useWorkoutController from "../hooks/useWorkoutController";
 import useTimer from "../hooks/useTimer";
 import Timer from "../components/timer";
-import * as SecureStore from "expo-secure-store";
-import { Redirect } from 'expo-router';
 import { useState } from "react";
 
 
 function ExerciseScreen() {
   const [isPaused, setIsPaused] = useState(false);
-
-  // const handleLogin = async () => {
-  //   const authToken = await SecureStore.getItemAsync("token");
-  //   console.log("authToken", authToken);
-
-  //   if (authToken) {
-  //     return <Redirect href="/myExercises" />;
-  //   }
-  //   else {
-  //     return <Redirect href="/login" />;
-
-  //   }
-  // }
-
-  // handleLogin()
 
   const { handleStartWorkout, handlePauseWorkout,
     handleResumeWorkout, handleStopWorkout } = useWorkoutController();

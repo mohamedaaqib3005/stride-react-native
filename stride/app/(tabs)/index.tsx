@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import * as SecureStore from "expo-secure-store";
+import { getItemAsync } from "expo-secure-store";
 import { Redirect } from "expo-router";
 
 export default function Index() {
   const [token, setToken] = useState(undefined);
   useEffect(() => {
-    const checkAuth = async () => {
-      const storedToken = await SecureStore.getItemAsync("token");
+    const checkToken = async () => {
+      const storedToken = await getItemAsync("token");
       setToken(storedToken);
     };
 
-    checkAuth();
+    checkToken();
   }, []);
 
 
@@ -19,7 +19,7 @@ export default function Index() {
   }
 
   if (token) {
-    return <Redirect href="/myExercises" />;
+    return <Redirect href="/myWorkouts" />;
   } else {
     return <Redirect href="/login" />;
   }

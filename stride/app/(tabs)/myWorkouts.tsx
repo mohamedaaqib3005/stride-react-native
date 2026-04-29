@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
-import * as SecureStore from "expo-secure-store";
+import { getItemAsync, deleteItemAsync } from "expo-secure-store";
 import { router } from "expo-router";
 
 
@@ -9,7 +9,7 @@ function RedirectScreen() {
   useEffect(() => {
     const loadToken = async () => {
       try {
-        const storedToken = await SecureStore.getItemAsync("token");
+        const storedToken = await getItemAsync("token");
         console.log("Token from SecureStore", storedToken);
 
       } catch (error) {
@@ -19,7 +19,7 @@ function RedirectScreen() {
     loadToken();
   }, []);
   const Logout = async () => {
-    await SecureStore.deleteItemAsync("token");
+    await deleteItemAsync("token");
     console.log("Token cleared");
     router.replace("/login");
 
@@ -63,6 +63,8 @@ const styles = StyleSheet.create({
   logoutText: {
     color: "white",
     fontSize: 16,
+    fontWeight: "200",
+    fontFamily: "Outfit_700Bold",
   },
   startNewWorkoutButton: {
     backgroundColor: "#06b2cc",
