@@ -8,6 +8,7 @@ export async function startWorkout() {
 
   try {
     const token = await SecureStore.getItemAsync("token");
+
     const result = await fetch(`${BASE_URL}/api/workouts`,  // wait for network response
       {
         method: "POST",
@@ -48,12 +49,12 @@ export async function startWorkout() {
 //  Sends it to the server
 // Returns a Promise with the response
 
-export async function stopWorkout(workout_id) {
+export async function updateWorkout(workout_id, status) {
 
   try {
     const token = await SecureStore.getItemAsync("token");
 
-    console.log(`stopping for ${workout_id}`)
+    console.log(`updating workout for ${workout_id}${status}`)
     console.log("date", new Date())
 
     const result = await fetch(`${BASE_URL}/api/workouts/${workout_id}/status`, {
@@ -64,12 +65,18 @@ export async function stopWorkout(workout_id) {
 
       },
       body: JSON.stringify({
-        "status": "stop",
+        status,
         modified_at: (new Date().toISOString())
       })
     })
     console.log("result", result);
     console.log("HTTP status", result.status);
+
+    if (!result.ok) {
+      const errorText = await result.text();
+      console.log("Server error:", errorText);
+      throw new Error("Request failed");
+    }
 
     const text = await result.text();
     console.log("response", text);

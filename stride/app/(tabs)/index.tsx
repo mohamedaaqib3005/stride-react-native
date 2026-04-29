@@ -6,42 +6,53 @@ import useTimer from "../hooks/useTimer";
 import Timer from "../components/timer";
 import * as SecureStore from "expo-secure-store";
 import { Redirect } from 'expo-router';
-
+import { useState } from "react";
 
 
 function ExerciseScreen() {
+  const [isPaused, setIsPaused] = useState(false);
 
+  // const handleLogin = async () => {
+  //   const authToken = await SecureStore.getItemAsync("token");
+  //   console.log("authToken", authToken);
 
-  const handleLogin = async () => {
-    const authToken = await SecureStore.getItemAsync("token");
-    console.log("authToken", authToken);
+  //   if (authToken) {
+  //     return <Redirect href="/myExercises" />;
+  //   }
+  //   else {
+  //     return <Redirect href="/login" />;
 
-    if (authToken) {
-      return <Redirect href="/myExercises" />;
-    }
-    else {
-      return <Redirect href="/login" />;
+  //   }
+  // }
 
-    }
-  }
+  // handleLogin()
 
-  handleLogin()
-  const { handleStartWorkout, handleStopWorkout } = useWorkoutController();
+  const { handleStartWorkout, handlePauseWorkout,
+    handleResumeWorkout, handleStopWorkout } = useWorkoutController();
 
   const { time, startTimer, pauseTimer, stopTimer } = useTimer();
   const handleStart = async () => {
-    const result = await handleStartWorkout();
-    if (result?.success) startTimer();
+    if (isPaused) {
+      await handleResumeWorkout();
+      startTimer();
+      setIsPaused(false);
+    } else {
+      const result = await handleStartWorkout();
+      if (result?.success) startTimer();
+    }
+  };
 
-  }
-  const handleStop = () => {
-    stopTimer();
-    handleStopWorkout()
-  }
   const handlePause = () => {
     pauseTimer();
-  }
+    handlePauseWorkout();
+    setIsPaused(true);
+  };
 
+  const handleStop = () => {
+    stopTimer();
+    handleStopWorkout();
+    setIsPaused(false);
+  };
   return (
     <View style={styles.container}>
       <View style={styles.content}>
@@ -51,17 +62,20 @@ function ExerciseScreen() {
 
       <View style={styles.bottomButtons}>
         <Pressable style={styles.button} onPressIn={handleStart}>
-          <Text style={styles.buttonText}>START</Text>
+          <Text style={styles.buttonText}>
+            {isPaused ? "RESUME" : "START"}
+          </Text>
         </Pressable>
 
         <Pressable
           style={styles.button} onPressIn={handleStop}>
           <Text style={styles.buttonText}>STOP</Text>
         </Pressable>
-        <Pressable
-          style={styles.button} onPressIn={handlePause}>
-          <Text style={styles.buttonText}>PAUSE</Text>
-        </Pressable>
+        {!isPaused && (
+          <Pressable style={styles.button} onPressIn={handlePause}>
+            <Text style={styles.buttonText}>PAUSE</Text>
+          </Pressable>
+        )}
       </View>
     </View>
   );

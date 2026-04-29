@@ -12,7 +12,14 @@ import type { LocationSubscription } from 'expo-location';
 function useWorkoutController() {
   const socketRef = useRef<WebSocket | null>(null);
   const locationSubscription = useRef<LocationSubscription | null>(null);
-  const { startWorkoutSession, stopWorkoutSession } = useWorkout()
+
+  const {
+    startWorkoutSession,
+    pauseWorkoutSession,
+    resumeWorkoutSession,
+    stopWorkoutSession,
+    workoutId
+  } = useWorkout();
 
   async function watchUserLocation(workoutId: string) {
     const permissionObject = await requestForegroundPermissionsAsync()
@@ -25,11 +32,11 @@ function useWorkoutController() {
       return;
     }
 
-    const location = await getCurrentPositionAsync({
-      accuracy: Accuracy.High
-    })
+    // const location = await getCurrentPositionAsync({
+    //   accuracy: Accuracy.High
+    // })
 
-    console.log("WORKOUT ID INSIDE WATCH:", workoutId);
+    console.log("WORKOUT ID:", workoutId);
     locationSubscription.current = await watchPositionAsync({
       accuracy: Accuracy.High,
       timeInterval: 5000,
@@ -100,7 +107,7 @@ function useWorkoutController() {
       console.log("RECEIVED workoutId in controller:", workoutId);
 
       if (!workoutId) {
-        console.log("❌ workoutId missing — stopping flow");
+        console.log("workoutId missing stopping flow");
         return;
       }
 
@@ -117,6 +124,40 @@ function useWorkoutController() {
 
   }
 
+  function handlePauseWorkout() {
+    pauseWorkoutSession();
+
+    if (locationSubscription.current) {
+      locationSubscription.current.remove();
+      locationSubscription.current = null;
+    }
+
+    if (socketRef.current) {
+      socketRef.current.close();
+      socketRef.current = null;
+    }
+
+    console.log("Workout paused (GPS + socket stopped)");
+  }
+
+  async function handleResumeWorkout() {
+    const id = workoutId;
+
+    if (!id) {
+      console.log(" no workoutId to resume");
+      return;
+    }
+
+    await resumeWorkoutSession();
+
+    if (socketRef.current == null) {
+      socketRef.current = await connectWebsocket();
+    }
+
+    // restart GPS tracking with SAME workoutId
+    await watchUserLocation(workoutId);
+  }
+
   async function handleStopWorkout() {
     const session = await stopWorkoutSession()
     const location = stopWatchingUserLocation()
@@ -129,7 +170,13 @@ function useWorkoutController() {
     };
   }
 
-  return { handleStartWorkout, handleStopWorkout };
+  return {
+    handleStartWorkout,
+    handlePauseWorkout,
+    handleResumeWorkout,
+    handleStopWorkout,
+  };
+
 }
 
 export default useWorkoutController;

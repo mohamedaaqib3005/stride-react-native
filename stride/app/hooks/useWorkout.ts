@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { startWorkout, stopWorkout } from "../api/workout";
+import { startWorkout, updateWorkout } from "../api/workout";
 
 
 
@@ -23,9 +23,24 @@ function useWorkout() {
     return workoutId;
   }
 
+  async function pauseWorkoutSession() {
+    if (!workoutId) return;
+
+    await updateWorkout(workoutId, "pause");
+    setIsRunning(false);
+  }
+
+  async function resumeWorkoutSession() {
+    if (!workoutId) return;
+
+    await updateWorkout(workoutId, "resume");
+    setIsRunning(true);
+  }
+
   async function stopWorkoutSession() {
     if (!workoutId) return;
-    await stopWorkout(workoutId)
+
+    await updateWorkout(workoutId, "stop");
     setIsRunning(false);
     setWorkoutId(null);
 
@@ -33,8 +48,11 @@ function useWorkout() {
 
   return {
     startWorkoutSession,
+    pauseWorkoutSession,
+    resumeWorkoutSession,
     stopWorkoutSession,
     isRunning,
+    workoutId
   }
 }
 
