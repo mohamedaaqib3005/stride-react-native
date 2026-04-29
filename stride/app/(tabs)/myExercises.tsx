@@ -1,6 +1,7 @@
 import { useEffect } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { router } from "expo-router";
 
 
 function RedirectScreen() {
@@ -17,9 +18,18 @@ function RedirectScreen() {
     };
     loadToken();
   }, []);
+  const Logout = async () => {
+    await SecureStore.deleteItemAsync("token");
+    console.log("Token cleared");
+    router.replace("/login");
+
+  };
   return (
     <View style={styles.container}>
       <Text style={styles.content}>Workout Log Empty</Text>
+      <Pressable onPress={Logout} style={styles.logoutButton}>
+        <Text style={styles.logoutText}>Logout</Text>
+      </Pressable>
     </View>
   );
 }
@@ -36,6 +46,15 @@ const styles = StyleSheet.create({
     color: "#06b2cc",
     fontSize: 16,
     fontFamily: "Outfit_700Bold",
+  },
+  logoutButton: {
+    backgroundColor: "red",
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+  },
+  logoutText: {
+    color: "white",
+    fontSize: 16,
   }
 
 })
