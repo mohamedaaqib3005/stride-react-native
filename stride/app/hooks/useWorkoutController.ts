@@ -29,11 +29,13 @@ function useWorkoutController() {
       accuracy: Accuracy.High
     })
 
+    console.log("WORKOUT ID INSIDE WATCH:", workoutId);
     locationSubscription.current = await watchPositionAsync({
       accuracy: Accuracy.High,
       timeInterval: 5000,
       distanceInterval: 0
     },
+
       (location) => {
         const payload = {
           latitude: location.coords.latitude,
@@ -95,6 +97,13 @@ function useWorkoutController() {
     }
     try {
       const workoutId = await startWorkoutSession();
+      console.log("RECEIVED workoutId in controller:", workoutId);
+
+      if (!workoutId) {
+        console.log("❌ workoutId missing — stopping flow");
+        return;
+      }
+
       socketRef.current = await connectWebsocket() //  socketRef.current = await connectWebsocket(workoutId);
       const locationResult = await watchUserLocation(workoutId);
 

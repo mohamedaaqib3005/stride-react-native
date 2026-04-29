@@ -14,7 +14,9 @@ function useWorkout() {
       console.log("Workout start failed");
       return;
     }
-    const workoutId = workoutResponse.id
+    const workoutId = workoutResponse.id;
+
+    console.log("EXTRACTED workoutId:", workoutId, typeof workoutId);
     console.log("workoutId", workoutId)
     setWorkoutId(workoutId);
     setIsRunning(true);

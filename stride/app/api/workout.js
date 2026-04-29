@@ -1,20 +1,19 @@
-// import * as SecureStore from "expo-secure-store";
+import * as SecureStore from "expo-secure-store";
 
 const BASE_URL = "https://guava-3a7j.onrender.com";
 
 
-// const token = await SecureStore.getItemAsync("token");
-// console.log("token", token);
 
 export async function startWorkout() {
 
   try {
+    const token = await SecureStore.getItemAsync("token");
     const result = await fetch(`${BASE_URL}/api/workouts`,  // wait for network response
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // 'Authorization': 'Bearer ' + token
+          'Authorization': 'Bearer ' + token
 
         },
         body: JSON.stringify({
@@ -52,6 +51,8 @@ export async function startWorkout() {
 export async function stopWorkout(workout_id) {
 
   try {
+    const token = await SecureStore.getItemAsync("token");
+
     console.log(`stopping for ${workout_id}`)
     console.log("date", new Date())
 
@@ -59,7 +60,7 @@ export async function stopWorkout(workout_id) {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        // 'Authorization': 'Bearer ' + token
+        'Authorization': 'Bearer ' + token
 
       },
       body: JSON.stringify({
