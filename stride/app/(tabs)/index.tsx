@@ -25,3 +25,4 @@ export default function Index() {
   }
 }
 
+//change checkToken into IIFE since it is used only once

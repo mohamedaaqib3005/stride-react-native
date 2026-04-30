@@ -1,11 +1,11 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { makeRedirectUri } from "expo-auth-session";
 import { openAuthSessionAsync } from "expo-web-browser";
-import { setItemAsync, getItemAsync } from "expo-secure-store";
+import { setItemAsync, } from "expo-secure-store";
 
 
 
-const API_BASE = "https://guava-3a7j.onrender.com/api/v1/login?redirect_url=";
+const LOGIN_API_URL = "https://guava-3a7j.onrender.com/api/v1/login?redirect_url=";
 
 function LoginScreen() {
 
@@ -19,12 +19,12 @@ function LoginScreen() {
 
   console.log("redirectUri", redirectUri);
 
-  const authUrl = `${API_BASE}${encodeURIComponent(redirectUri)}`;
+  const authUrl = `${LOGIN_API_URL}${encodeURIComponent(redirectUri)}`;
 
 
   const login = async () => {
     try {
-      const response = await openAuthSessionAsync( // returns a promise with result or error{type:success,url:string} where type is type of result state,url is redirect url
+      const response = await openAuthSessionAsync( // returns a promise with result {type:success,url:string}or error {type:dismiss} where type is type of result state,url is redirect url
         authUrl,
         redirectUri
       )
@@ -37,13 +37,13 @@ function LoginScreen() {
         const token = url.searchParams.get("token");
         console.log("tokens", token)
 
-        if (token) {
-          // Store token in secure Store
-          await setItemAsync("token", token);
 
-          const savedToken = await getItemAsync("token");
-          console.log("savedToken", savedToken)
+        if (!token) {
+          throw new Error("Token not received")
         }
+        // Store token in secure Store
+        await setItemAsync("token", token);
+
       }
     } catch (error) {
       console.log("error:", error)

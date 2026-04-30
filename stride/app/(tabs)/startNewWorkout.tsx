@@ -45,10 +45,29 @@ function ExerciseScreen() {
       </View>
 
       <View style={styles.bottomButtons}>
-        <Pressable style={styles.button} onPressIn={handleStart}>
-          <Text style={styles.buttonText}>
-            {isPaused ? "RESUME" : "START"}
-          </Text>
+        <Pressable onPress={handleStart}>
+          {({ pressed }) => (
+            <View
+              style={
+                [styles.button, {
+                  backgroundColor: pressed
+                    ? "transparent"
+                    : "#06b2cc",
+                  borderWidth: pressed ? 2 : 0,
+                  borderColor: "#06b2cc",
+                }]}
+            >
+              <Text style={[styles.buttonText
+                , {
+                color: pressed
+                  ? "#06b2cc"
+                  : "black"
+              },]
+              }>
+                {isPaused ? "RESUME" : "START"}
+              </Text>
+            </View>
+          )}
         </Pressable>
 
         <Pressable
@@ -61,7 +80,7 @@ function ExerciseScreen() {
           </Pressable>
         )}
       </View>
-    </View>
+    </View >
   );
 }
 
@@ -107,13 +126,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     borderRadius: 999,
     marginHorizontal: 8, // replaces gap
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 120,
   },
 
   buttonText: {
+    color: "black",
     fontSize: 18,
     fontWeight: "600",
     fontFamily: "Outfit_700Bold",
   },
+
 });
 
 
