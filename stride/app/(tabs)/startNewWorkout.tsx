@@ -40,47 +40,109 @@ function ExerciseScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.content}>
-        <Timer style={styles.display} time={time} />{/* cannot use timer inside text component since it returns view ... */}
-        {/* text is inline */}
+        <Timer style={styles.display} time={time} />
       </View>
 
       <View style={styles.bottomButtons}>
-        <Pressable onPress={handleStart}>
+
+        {/* START / RESUME */}
+        <Pressable
+          onPress={handleStart}
+          style={styles.buttonWrapper}
+        >
           {({ pressed }) => (
             <View
-              style={
-                [styles.button, {
-                  backgroundColor: pressed
-                    ? "transparent"
-                    : "#06b2cc",
+              style={[
+                styles.button,
+                {
+                  backgroundColor: pressed ? "transparent" : "#06b2cc",
                   borderWidth: pressed ? 2 : 0,
                   borderColor: "#06b2cc",
-                }]}
+                  transform: [{ scale: pressed ? 1.05 : 1 }],
+                },
+              ]}
             >
-              <Text style={[styles.buttonText
-                , {
-                color: pressed
-                  ? "#06b2cc"
-                  : "black"
-              },]
-              }>
+              <Text
+                style={[
+                  styles.buttonText,
+                  {
+                    color: pressed ? "#06b2cc" : "black",
+                  },
+                ]}
+              >
                 {isPaused ? "RESUME" : "START"}
               </Text>
             </View>
           )}
         </Pressable>
 
+        {/* STOP */}
         <Pressable
-          style={styles.button} onPressIn={handleStop}>
-          <Text style={styles.buttonText}>STOP</Text>
+          onPress={handleStop}
+          style={styles.buttonWrapper}
+        >
+          {({ pressed }) => (
+            <View
+              style={[
+                styles.button,
+                {
+                  backgroundColor: pressed ? "transparent" : "#06b2cc",
+                  borderWidth: pressed ? 2 : 0,
+                  borderColor: "#06b2cc",
+                  transform: [{ scale: pressed ? 1.05 : 1 }],
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.buttonText,
+                  {
+                    color: pressed ? "#06b2cc" : "black",
+                  },
+                ]}
+              >
+                STOP
+              </Text>
+            </View>
+          )}
         </Pressable>
+
+        {/* PAUSE */}
         {!isPaused && (
-          <Pressable style={styles.button} onPressIn={handlePause}>
-            <Text style={styles.buttonText}>PAUSE</Text>
+          <Pressable
+            onPress={handlePause}
+            style={styles.buttonWrapper}
+          >
+            {({ pressed }) => (
+              <View
+                style={[
+                  styles.button,
+                  {
+                    backgroundColor: pressed ? "transparent" : "#06b2cc",
+                    borderWidth: pressed ? 2 : 0,
+                    borderColor: "#06b2cc",
+                    transform: [{ scale: pressed ? 1.05 : 1 }],
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.buttonText,
+                    {
+                      color: pressed
+                        ? "#06b2cc"
+                        : "black",
+                    },
+                  ]}
+                >
+                  PAUSE
+                </Text>
+              </View>
+            )}
           </Pressable>
         )}
       </View>
-    </View >
+    </View>
   );
 }
 
@@ -117,18 +179,19 @@ const styles = StyleSheet.create({
   bottomButtons: {
     flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
 
   button: {
     backgroundColor: "#06b2cc",
     paddingVertical: 16,
-    paddingHorizontal: 32,
+    paddingHorizontal: 20,
     borderRadius: 999,
     marginHorizontal: 8, // replaces gap
     alignItems: "center",
     justifyContent: "center",
-    minWidth: 120,
+    minWidth: 90,
   },
 
   buttonText: {
@@ -137,6 +200,9 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontFamily: "Outfit_700Bold",
   },
+  buttonWrapper: {
+    marginHorizontal: 8,
+  }
 
 });
 
