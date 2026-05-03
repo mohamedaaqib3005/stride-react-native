@@ -13,6 +13,9 @@ function useWorkoutController() {
   const socketRef = useRef<WebSocket | null>(null);
   const locationSubscription = useRef<LocationSubscription | null>(null);
 
+
+  const isStartingRef = useRef(false);
+
   const {
     startWorkoutSession,
     pauseWorkoutSession,
@@ -98,6 +101,11 @@ function useWorkoutController() {
 
 
   async function handleStartWorkout() {
+
+    if (isStartingRef.current) {
+      console.log("Workout start already in progress");
+      return;
+    }
     if (locationSubscription.current) {
       console.log("Workout already running")
       return;
