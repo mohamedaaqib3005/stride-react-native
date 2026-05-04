@@ -88,6 +88,17 @@ export async function updateWorkout(workout_id, status) {
   }
 }
 
+export async function getWorkouts() {
+  const token = await SecureStore.getItemAsync("token");
+  const res = await fetch(`${BASE_URL}/api/workouts/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    }
+  })
+  const data = await res.json();
+  return data;
+}
+
 
 
 

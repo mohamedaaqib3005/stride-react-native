@@ -2,11 +2,37 @@ import { useEffect } from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
 import { getItemAsync, deleteItemAsync } from "expo-secure-store";
 import { router } from "expo-router";
+import { useState } from "react";
+import { FlatList } from "react-native"
+import { getWorkouts } from "../api/workout";
+
+
 
 
 function RedirectScreen() {
 
+  const [workouts, setWorkouts] = useState([]);
+
+
+
   useEffect(() => {
+    const fetchWorkouts = async () => {
+      try {
+        const data = await getWorkouts();
+        console.log("WORKOUTS:", data);
+        setWorkouts(data);
+      }
+      catch (error) {
+        console.log("Error fetching workouts:", error);
+      }
+    };
+    fetchWorkouts();
+  }, []);
+
+
+  useEffect(() => {
+
+
     const loadToken = async () => {
       try {
         const storedToken = await getItemAsync("token");
@@ -26,16 +52,43 @@ function RedirectScreen() {
   };
   return (
     <View style={styles.container}>
-      <Text style={styles.content}>Workout Log Empty</Text>
-      <Pressable
-        style={styles.startNewWorkoutButton}
-        onPress={() => router.replace("/startNewWorkout")}
-      >
-        <Text style={styles.startNewWorkoutText}>Start New Workout</Text>
-      </Pressable>
-      <Pressable onPress={Logout} style={styles.logoutButton}>
-        <Text style={styles.logoutText}>Logout</Text>
-      </Pressable>
+
+      {/* LIST AREA */}
+      <View style={{ flex: 1 }}>
+        {workouts.length === 0 ? (
+          <Text style={styles.content}>Workout Log Empty</Text>
+        ) : (
+          <FlatList
+            data={workouts}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => (
+              <View style={styles.card}>
+                <Text style={styles.cardText}>
+                  Workout ID: {item.id}
+                </Text>
+              </View>
+            )}
+            contentContainerStyle={{ padding: 20 }}
+          />
+        )}
+      </View>
+
+      {/* FOOTER */}
+      <View style={styles.footer}>
+        <Pressable
+          style={styles.startNewWorkoutButton}
+          onPress={() => router.replace("/startNewWorkout")}
+        >
+          <Text style={styles.startNewWorkoutText}>
+            Start New Workout
+          </Text>
+        </Pressable>
+
+        <Pressable onPress={Logout} style={styles.logoutButton}>
+          <Text style={styles.logoutText}>Logout</Text>
+        </Pressable>
+      </View>
+
     </View>
   );
 }
@@ -45,8 +98,7 @@ export default RedirectScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    paddingTop: 60,
   },
   content: {
     color: "#06b2cc",
@@ -81,6 +133,22 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     fontFamily: "Outfit_700Bold",
+  },
+  card: {
+    backgroundColor: "#1e1e1e",
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 10,
+    marginHorizontal: 16,
+  },
+
+  cardText: {
+    color: "white",
+    fontSize: 16,
+  },
+  footer: {
+    alignItems: "center",
+    paddingBottom: 40,
   },
 
 })
