@@ -11,8 +11,13 @@ import { useState } from "react";
 function ExerciseScreen() {
   const [isPaused, setIsPaused] = useState(false);
 
-  const { handleStartWorkout, handlePauseWorkout,
-    handleResumeWorkout, handleStopWorkout } = useWorkoutController();
+  const {
+    handleStartWorkout,
+    handlePauseWorkout,
+    handleResumeWorkout,
+    handleStopWorkout,
+    stats,
+  } = useWorkoutController();
 
   const { time, startTimer, pauseTimer, stopTimer } = useTimer();
   const handleStart = async () => {
@@ -42,7 +47,17 @@ function ExerciseScreen() {
       <View style={styles.content}>
         <Timer style={styles.display} time={time} />
       </View>
+      <View style={styles.statsContainer}>
 
+        <Text style={styles.statsText}>
+          Distance: {stats.distance} km
+        </Text>
+
+        <Text style={styles.statsText}>
+          Time: {stats.time} km/h
+        </Text>
+
+      </View>
       <View style={styles.bottomButtons}>
 
         {/* START / RESUME */}
@@ -202,7 +217,17 @@ const styles = StyleSheet.create({
   },
   buttonWrapper: {
     marginHorizontal: 8,
-  }
+  },
+  statsContainer: {
+    alignItems: "center",
+    marginTop: 20,
+  },
+
+  statsText: {
+    color: "white",
+    fontSize: 20,
+    marginVertical: 4,
+  },
 
 });
 

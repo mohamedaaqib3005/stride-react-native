@@ -5,7 +5,7 @@ import {
   Accuracy
 } from 'expo-location';
 import connectWebsocket from '../services/websocketService';
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import useWorkout from "./useWorkout"
 import type { LocationSubscription } from 'expo-location';
 
@@ -15,6 +15,10 @@ function useWorkoutController() {
 
 
   const isStartingRef = useRef(false);
+  const [stats, setStats] = useState({
+    distance: 0,
+    time: 0,
+  });
 
   const {
     startWorkoutSession,
@@ -68,8 +72,14 @@ function useWorkoutController() {
         // console.log("Speed", location.coords.speed);
         // console.log("Altitude", location.coords.altitude);
         const socket = socketRef.current;
-        if (socket && socket.readyState === WebSocket.OPEN) {
-          socket.send(JSON.stringify(message));
+
+        if (
+          socket &&
+          socket.readyState === WebSocket.OPEN
+        ) {
+          socket.send(
+            JSON.stringify(message)
+          );
         }
       }
     );
@@ -109,7 +119,9 @@ function useWorkoutController() {
     if (locationSubscription.current) {
       console.log("Workout already running")
       return;
+
     }
+    isStartingRef.current = true;
     try {
       const workoutId = await startWorkoutSession();
       console.log("RECEIVED workoutId in controller:", workoutId);
@@ -119,31 +131,75 @@ function useWorkoutController() {
         return;
       }
 
-      socketRef.current = await connectWebsocket() //  socketRef.current = await connectWebsocket(workoutId);
-      const locationResult = await watchUserLocation(workoutId);
+      socketRef.current = await connectWebsocket()
 
-      return { success: true, workoutId, socket: socketRef.current, location: locationResult }
-    } catch (error) {
+      console.log(
+        "Websocket connected"
+      );
+      socketRef.current.onmessage = (
+        event
+      ) => {
+
+        console.log(
+          "RAW WS:",
+          event.data
+        );
+
+        const data = JSON.parse(event.data);
+
+        console.log(
+          "PARSED WS:",
+          data
+        );
+
+        setStats({
+          distance: data.distance || 0,
+          time: data.time || 0,
+        });
+
+        console.log(
+          "UPDATED STATS:",
+          data
+        );
+      };
+
+      await watchUserLocation(
+        workoutId
+      );
+
+      return {
+        success: true
+      };
+
+    } catch (error: any) {
+
       return {
         success: false,
-        error: error.message
-      }
+        error: error.message,
+      };
+
+    } finally {
+
+      isStartingRef.current = false;
     }
 
   }
 
   function handlePauseWorkout() {
     pauseWorkoutSession();
+    stopWatchingUserLocation();
 
-    if (locationSubscription.current) {
-      locationSubscription.current.remove();
-      locationSubscription.current = null;
-    }
+    closeWebsocketConnection();
 
-    if (socketRef.current) {
-      socketRef.current.close();
-      socketRef.current = null;
-    }
+    // if (locationSubscription.current) {
+    //   locationSubscription.current.remove();
+    //   locationSubscription.current = null;
+    // }
+
+    // if (socketRef.current) {
+    //   socketRef.current.close();
+    //   socketRef.current = null;
+    // }
 
     console.log("Workout paused (GPS + socket stopped)");
   }
@@ -167,14 +223,12 @@ function useWorkoutController() {
   }
 
   async function handleStopWorkout() {
-    const session = await stopWorkoutSession()
-    const location = stopWatchingUserLocation()
-    const socket = closeWebsocketConnection()
+    await stopWorkoutSession()
+    stopWatchingUserLocation()
+    closeWebsocketConnection()
     return {
       success: true,
-      session,
-      location,
-      socket
+
     };
   }
 
@@ -183,6 +237,7 @@ function useWorkoutController() {
     handlePauseWorkout,
     handleResumeWorkout,
     handleStopWorkout,
+    stats,
   };
 
 }
